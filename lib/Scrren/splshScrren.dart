@@ -12,25 +12,35 @@ class MySplshScrren extends StatefulWidget {
 }
 
 class _MySplshScrrenState extends State<MySplshScrren> {
-  
-  Future<void> getSplashScrren() async {
-    await Future.delayed(Duration(seconds: 5)); Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyWlcomeSccreen(),));
-  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getSplashScrren();
   }
-  
-  @override
+  Future<void> getSplashScrren() async {
+    await Future.delayed(Duration(seconds: 5));
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyWlcomeSccreen(),
+        ));
+  }
 
+  
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(children: [
-          Lottie.network('https://lottie.host/e3a2039f-1e9f-497e-9c3e-99556850aa28/KVBddK9at8.json',
-                        fit: BoxFit.fill,height: 500,width: 500,reverse: true, repeat: true)
+          Lottie.network(
+              'https://lottie.host/e3a2039f-1e9f-497e-9c3e-99556850aa28/KVBddK9at8.json',
+              fit: BoxFit.fill,
+              height: 500,
+              width: 500,
+              reverse: true,
+              repeat: true)
         ]),
       ),
     );

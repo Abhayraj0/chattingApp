@@ -1,6 +1,7 @@
 import 'package:chattingmessaging/Scrren/loginScrren.dart';
 import 'package:chattingmessaging/Scrren/messages.dart';
 import 'package:chattingmessaging/Scrren/profile.dart';
+import 'package:chattingmessaging/Scrren/profileDashbord.dart';
 import 'package:chattingmessaging/Widget/Color/colorEx.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +17,7 @@ class MyHomeSccren extends StatefulWidget {
 }
 
 class _MyHomeSccrenState extends State<MyHomeSccren> {
+  bool isVis = false;
   String? name = "";
   Future<void> getUser() async {
     var document = await FirebaseFirestore.instance
@@ -38,7 +40,7 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
   List<DocumentSnapshot>? mainList;
   List<DocumentSnapshot>? filterList;
 
-  void searchData(String? keyWord) async {
+  void searchData(String? keyWord) {
     // DocumentSnapshot allData = await FirebaseFirestore.instance.collection("Abhayraj").doc().get();
 
     setState(() {
@@ -55,14 +57,13 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference users =
-        FirebaseFirestore.instance.collection("Users");
+    CollectionReference users = FirebaseFirestore.instance.collection("Users");
     return Container(
         color: AllColorsName.backgroundColorA,
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            title: Text("Hi, $name"),
+            title: Text("Hi, ${name ?? ''}"),
             iconTheme: IconThemeData(color: AllColorsName.buttonColor),
             actions: [
               PopupMenuButton(
@@ -72,8 +73,8 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MyProfile(
-                            user: widget.user,
+                          builder: (context) => MyProfileDashBoard(
+                            user: widget.user!,
                           ),
                         ));
                   } else if (value == "LogOut") {
@@ -104,7 +105,7 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
           ),
           backgroundColor: Colors.transparent,
           body: Padding(
-            padding: EdgeInsets.only(left:30.0,right: 30),
+            padding: EdgeInsets.only(left: 30.0, right: 30),
             child: Column(children: [
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -131,7 +132,9 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
                           TextStyle(color: Color.fromARGB(255, 65, 40, 70))),
                 ),
               ),
-              SizedBox(height: 26,),
+              SizedBox(
+                height: 26,
+              ),
               Expanded(
                   child: StreamBuilder(
                 stream: users.snapshots(),
@@ -147,24 +150,46 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyMessagesScrren(documentSnapshot: filterList![index]),));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyMessagesScrren(
+                                      documentSnapshot: filterList![index]),
+                                ));
                           },
-                          child: Card(
-                            color: AllColorsName.backgroundColorA,
-                            shadowColor: Colors.black,
-                            elevation: 30,
-                            surfaceTintColor: const Color.fromARGB(255, 56, 104, 128),
-                            child: Row(children: [
-                              Container(
-                                  height: 100,
-                                  width: 100,
-                                  child: Image.network(
-                                      "${filterList![index]['Profile Url']}")),
-                              Text(
-                                "${filterList![index]['Name']}",
-                                style: GoogleFonts.handjet(fontSize: 30),
-                              )
-                            ]),
+                          child: Container(
+                            height: 100,
+                            width: 100,
+                            child: Card(
+                              color: AllColorsName.backgroundColorA,
+                              shadowColor: Colors.black,
+                              elevation: 30,
+                              surfaceTintColor:
+                                  const Color.fromARGB(255, 56, 104, 128),
+                              child: Row(children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: 60,
+                                  width: 60,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      image: DecorationImage(
+                                          image: NetworkImage(filterList![index]
+                                              ['Profile Url'])),
+                                      borderRadius: BorderRadius.circular(200)),
+                                ),
+                                SizedBox(
+                                  width: 30,
+                                ),
+                                Text(
+                                  "${filterList![index]['Name']}",
+                                  style: GoogleFonts.handjet(fontSize: 30),
+                                )
+                              ]),
+                            ),
                           ),
                         );
                       },

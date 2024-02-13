@@ -18,15 +18,15 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
-  TextEditingController _contactController = TextEditingController();
+  TextEditingController _aboutController = TextEditingController();
 
-  Future<void> updateUser(String? name, contact, email) async {
+  Future<void> updateUser(String? name, about, email) async {
     User? user = await FirebaseAuth.instance.currentUser;
     // user!.updateEmail(email);
 
     await FirebaseFirestore.instance.collection("Users").doc(widget.user!.uid).update({
       "Name" : name,
-      "Contact" : contact,
+      "About" : about,
       "Email" : email
     });
   }
@@ -36,7 +36,7 @@ class _MyProfileState extends State<MyProfile> {
 
     setState(() {
       _nameController.text = document['Name'];
-      _contactController.text = document['Contact'];
+      _aboutController.text = document['About'];
       _emailController.text = document['Email'];
 
     });
@@ -49,7 +49,7 @@ class _MyProfileState extends State<MyProfile> {
   }
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+  return Scaffold(
       appBar: AppBar(),
       body: Center(
         child: SingleChildScrollView(
@@ -71,10 +71,10 @@ class _MyProfileState extends State<MyProfile> {
                       height: 25,
                     ),
                     MyTextField(
-                        iconData: Icons.contact_phone,
-                        controller: _contactController,
-                        lable: "Contact",
-                        hintText: "Enter the Contact"),
+                        iconData: Icons.info,
+                        controller: _aboutController,
+                        lable: "About Information",
+                        hintText: "Enter the About Information"),
                     SizedBox(
                       height: 25,
                     ),
@@ -88,7 +88,7 @@ class _MyProfileState extends State<MyProfile> {
                     ),
               InkWell(
                 onTap: () {
-                  updateUser(_nameController.text.toString(), _contactController.text.toString(), _emailController.text.toString());
+                  updateUser(_nameController.text.toString(), _aboutController.text.toString(), _emailController.text.toString());
                   Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomeSccren(user: widget.user),));
                 },
                   child: MyCustomeButton(

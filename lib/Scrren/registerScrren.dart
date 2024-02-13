@@ -24,19 +24,20 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
   TextEditingController _contactController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
-  Future<void> registerUser(
-      String? name, contact, email, password, profileUrl) async {
+  TextEditingController _aboutController = TextEditingController();
+  void registerUser() async {
     UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+        .createUserWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text);
     User? user = userCredential.user;
 
     await FirebaseFirestore.instance.collection("Users").doc(user!.uid).set({
-      "Name": name,
-      "Contact": contact,
-      "Email": email,
-      "Password": password,
-      "Profile Url": profilePicUrl
+      "Name": _nameController.text,
+      "Contact": _contactController.text,
+      "Email": _emailController.text,
+      "Password": _passwordController.text,
+      "Profile Url": profilePicUrl,
+      "About": _aboutController.text
     });
     Navigator.pushReplacement(
         context,
@@ -44,7 +45,14 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
           builder: (context) => MyHomeSccren(user: user),
         ));
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Successfully Register")));
+        .showSnackBar(const SnackBar(content: Text("Successfully Register")));
+    setState(() {
+      _nameController.clear();
+      _contactController.clear();
+      _aboutController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+    });
   }
 
   @override
@@ -74,7 +82,7 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
                       controller: _nameController,
                       lable: "UserName",
                       hintText: "Enter the userName"),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
                   MyTextField(
@@ -82,7 +90,15 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
                       controller: _contactController,
                       lable: "Contact",
                       hintText: "Enter the Contact"),
-                  SizedBox(
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  MyTextField(
+                      iconData: Icons.info_sharp,
+                      controller: _aboutController,
+                      lable: "About Information",
+                      hintText: "Enter the About Information"),
+                  const SizedBox(
                     height: 25,
                   ),
                   MyTextField(
@@ -90,7 +106,7 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
                       controller: _emailController,
                       lable: "Email",
                       hintText: "Enter the Email"),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
                   MyTextField(
@@ -98,35 +114,27 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
                       controller: _passwordController,
                       lable: "Password",
                       hintText: "Enter the Password"),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
                   InkWell(
-                      onTap: () async {
+                      onTap: () {
                         if (_nameController.text.isEmpty &&
                             _contactController.text.isEmpty &&
+                            _aboutController.text.isEmpty &&
                             _emailController.text.isEmpty &&
                             _passwordController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Please filled the details")));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Please filled the details")));
                         } else {
-                           await registerUser(
-                              _nameController.text,
-                              _contactController.text,
-                              _emailController.text,
-                              _passwordController.text,
-                              _passwordController.text);
-                          setState(() {
-                            _nameController.clear();
-                            _contactController.clear();
-                            _emailController.clear();
-                            _passwordController.clear();
-                          });
+                          registerUser();
                         }
                       },
                       child: MyCustomeButton(
-                          textvalue: "Register", colorname: AllColorsName.buttonColor)),
-                  SizedBox(
+                          textvalue: "Register",
+                          colorname: AllColorsName.buttonColor)),
+                  const SizedBox(
                     height: 25,
                   ),
                   Row(
@@ -142,7 +150,7 @@ class _MySignUpScrrenState extends State<MySignUpScrren> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MySignin(),
+                                  builder: (context) => const MySignin(),
                                 ));
                           },
                           child: Text(
