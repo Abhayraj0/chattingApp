@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chattingmessaging/Scrren/loginScrren.dart';
 import 'package:chattingmessaging/Scrren/wlcome.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -23,7 +24,7 @@ class _MySplshScrrenState extends State<MySplshScrren> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MyWlcomeSccreen(),
+          builder: (context) => MySignin(),
         ));
   }
 

@@ -75,14 +75,7 @@ class _MyProfileState extends State<MyProfile> {
                         controller: _aboutController,
                         lable: "About Information",
                         hintText: "Enter the About Information"),
-                    SizedBox(
-                      height: 25,
-                    ),
-                    MyTextField(
-                        iconData: Icons.email,
-                        controller: _emailController,
-                        lable: "User Email",
-                        hintText: "Enter the Email"),
+                    
                     SizedBox(
                       height: 25,
                     ),

@@ -1,12 +1,10 @@
 import 'package:chattingmessaging/Scrren/loginScrren.dart';
 import 'package:chattingmessaging/Scrren/messages.dart';
-import 'package:chattingmessaging/Scrren/profile.dart';
 import 'package:chattingmessaging/Scrren/profileDashbord.dart';
 import 'package:chattingmessaging/Widget/Color/colorEx.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MyHomeSccren extends StatefulWidget {
   User? user;
@@ -17,7 +15,6 @@ class MyHomeSccren extends StatefulWidget {
 }
 
 class _MyHomeSccrenState extends State<MyHomeSccren> {
-  bool isVis = false;
   String? name = "";
   Future<void> getUser() async {
     var document = await FirebaseFirestore.instance
@@ -55,6 +52,7 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
     });
   }
 
+  bool isVisible = false;
   @override
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance.collection("Users");
@@ -63,9 +61,33 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            title: Text("Hi, ${name ?? ''}"),
+            title: !isVisible
+                ? Text("Hi, ${name}")
+                : TextField(
+                    onChanged: (value) {
+                      searchData(value);
+                    },
+                    decoration: InputDecoration(
+                        hintText: "Search here name....",
+                        prefixIcon: Icon(Icons.search)),
+                  ),
             iconTheme: IconThemeData(color: AllColorsName.buttonColor),
             actions: [
+              isVisible
+                  ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isVisible = false;
+                        });
+                      },
+                      icon: Icon(Icons.cancel))
+                  : IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isVisible = true;
+                        });
+                      },
+                      icon: Icon(Icons.search)),
               PopupMenuButton(
                 icon: Icon(Icons.more_vert_sharp),
                 onSelected: (value) {
@@ -106,49 +128,28 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
           backgroundColor: Colors.transparent,
           body: Padding(
             padding: EdgeInsets.only(left: 30.0, right: 30),
-            child: Column(children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.3),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        offset: Offset(2, 7), // changes position of shadow
-                      ),
-                    ]),
-                child: TextFormField(
-                  onChanged: (value) {
-                    searchData(value);
-                  },
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      prefixIcon: Icon(Icons.search),
-                      labelText: "Search",
-                      hintText: "Type here....",
-                      hintStyle:
-                          TextStyle(color: Color.fromARGB(255, 65, 40, 70))),
-                ),
-              ),
-              SizedBox(
-                height: 26,
-              ),
-              Expanded(
-                  child: StreamBuilder(
-                stream: users.snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    // var allData = snapshot.data!.docs;
-                    mainList = snapshot.data!.docs
-                        .where((element) => element.id != widget.user!.uid)
-                        .toList();
-                    filterList ??= List.from(mainList!);
-                    return ListView.builder(
-                      itemCount: filterList!.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
+            child: Expanded(
+                child: StreamBuilder(
+              stream: users.snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  // var allData = snapshot.data!.docs;
+                  mainList = snapshot.data!.docs
+                      .where((element) => element.id != widget.user!.uid)
+                      .toList();
+                  filterList ??= List.from(mainList!);
+                  return ListView.builder(
+                  
+                    itemCount: filterList!.length+1,
+                    itemBuilder: (context, index) {
+                      if (index == filterList!.length) {
+                        return SizedBox(height: 20,);
+                      }
+                      return Card(
+                        surfaceTintColor: Colors.blueGrey,
+                        color: Colors.blueGrey[200],
+                        child: ListTile(
+                          minLeadingWidth: 40,
                           onTap: () {
                             Navigator.push(
                                 context,
@@ -157,48 +158,27 @@ class _MyHomeSccrenState extends State<MyHomeSccren> {
                                       documentSnapshot: filterList![index]),
                                 ));
                           },
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            child: Card(
-                              color: AllColorsName.backgroundColorA,
-                              shadowColor: Colors.black,
-                              elevation: 30,
-                              surfaceTintColor:
-                                  const Color.fromARGB(255, 56, 104, 128),
-                              child: Row(children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: 60,
-                                  width: 60,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      image: DecorationImage(
-                                          image: NetworkImage(filterList![index]
-                                              ['Profile Url'])),
-                                      borderRadius: BorderRadius.circular(200)),
-                                ),
-                                SizedBox(
-                                  width: 30,
-                                ),
-                                Text(
-                                  "${filterList![index]['Name']}",
-                                  style: GoogleFonts.handjet(fontSize: 30),
-                                )
-                              ]),
-                            ),
+                          leading: Container(
+                            alignment: Alignment.center,
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        filterList![index]['Profile Url']),fit: BoxFit.fill),
+                                borderRadius: BorderRadius.circular(200)),
                           ),
-                        );
-                      },
-                    );
-                  }
-                  return Center(child: CircularProgressIndicator.adaptive());
-                },
-              ))
-            ]),
+                          title: Text(filterList![index]['Name'],style: TextStyle(fontSize: 25,color: Colors.black),),
+                        ),
+                      );
+                      
+                    },
+                  );
+                }
+                return Center(child: CircularProgressIndicator.adaptive());
+              },
+            )),
           ),
         ));
   }
